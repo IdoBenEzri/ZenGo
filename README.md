@@ -9,7 +9,7 @@ Using AWS Cloudformation service, we create a new stack (using the "template.yam
 
 With this template - the AWS Cloudformation stack service deploying:
 
-- DynamoDB table "todos-table" - present a TODOs list.
+- DynamoDB table "todos-table" - presents a TODOs list.
 - Lambda function  - "DDBHandlerFunction" responsible to handle the TODOs list.
 - APIGateways that triggers the Lambda function and helps the user to integrate with the function using API endpoint.
 

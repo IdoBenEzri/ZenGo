@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  Template deploys a serverless TODOS application.
+  Deploys a serverless TODOS application - using serverless dynamoDB table "todos-table" as database, serverless Lambda  function "DDBHandlerFunction" as database handler (stored in s3 bucket), and APIGateways to trigger the Lambda function.
   
 Globals:
   Function:
@@ -11,50 +11,7 @@ Resources:
   DDBHandlerFunction:
     Type: AWS::Serverless::Function
     Properties:
-      InlineCode: > 
-          const AWS = require("aws-sdk");
-          const dynamo = new AWS.DynamoDB.DocumentClient();
-          exports.handler = async (event, context) => {
-            let body;
-            let statusCode = 200;
-            const headers = {
-              "Content-Type": "application/json"
-            };
-            try {
-              switch (event.routeKey) {
-                case "GET /todos":
-                  body = await dynamo
-                    .scan({ TableName: "todos-table" })
-                    .promise();
-                  break;
-                case "PUT /todos":
-                  let requestJSON = JSON.parse(event.body);
-                  await dynamo
-                    .put({
-                      TableName: "todos-table",
-                      Item: {
-                        todo: requestJSON.todo
-                      }
-                    })
-                    .promise();
-                  body = `Put todo${requestJSON.todo}`;
-                  break;
-                default:
-                  throw new Error(`Unsupported route: "${event.routeKey}"`);
-              }
-            } catch (err) {
-              statusCode = 400;
-              body = err.message;
-            } finally {
-              body = JSON.stringify(body);
-            }
-            return {
-              statusCode,
-              body,
-              headers
-            };
-          };
-
+      CodeUri: s3://idob-zengo-function/index.zip
       Handler: index.handler
       Runtime: nodejs12.x
       Policies:
